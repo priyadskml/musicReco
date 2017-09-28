@@ -26,9 +26,8 @@ def download_dataset(URL, f_name):
 
 # userid \t timestamp \t musicbrainz-artist-id \t artist-name \t musicbrainz-track-id \t track-name
 def load_dataset(dir_name, f_name):
-	data = pd.read_table(dir_name + "/" + f_name, names=["userid", "timestamp", "musicbrainz-artist-id", "artist-name", "musicbrainz-track-id", "track-name"], header=None, error_bad_lines=False)
+	data = pd.read_csv(dir_name + "/" + f_name, delimiter="\t", names=["userid", "timestamp", "artist-id", "artist-name", "track-id", "track-name"], header=None, error_bad_lines=False)
 	print("Read File...")
 	return data
-
 
 # def load_metadata(dir_name, f_name):
