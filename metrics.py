@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-from sklearn.metrics import ndcg_score
+# from sklearn.metrics import ndcg_score
 
 '''
  These are for rating predictions.
@@ -11,7 +11,7 @@ from sklearn.metrics import ndcg_score
 
 # Root Mean Square Error
 def root_mean_square_error(y_true, y_pred):
-	return np.sqrt(mean_squared_error(y_true, y_pred))
+    return np.sqrt(mean_squared_error(y_true, y_pred))
 
 '''
  These are for top-n recommendations.
@@ -19,13 +19,13 @@ def root_mean_square_error(y_true, y_pred):
 
 # Precision at k
 def precision(y_true, y_pred, k):
-	if len(y_pred)>k:
+    if len(y_pred)>k:
         y_pred = y_pred[:k]
 
     if not y_true:
         return 0.0
 
-	return len(set(y_pred).intersection(y_true)) /  float(len(y_pred))
+    return len(set(y_pred).intersection(y_true)) /  float(len(y_pred))
 
 def precision_k(y_true, y_pred, k):
     """
@@ -36,7 +36,7 @@ def precision_k(y_true, y_pred, k):
     y_pred : list
         A list of lists of predicted elements
     k : int 
-    	The maximum number of predicted elements
+        The maximum number of predicted elements
     """
     set(b1).intersection(b2)
     return np.mean([precision(a, p, k)  for a,p in zip(y_true, y_pred)])
@@ -80,7 +80,7 @@ def mean_average_precision(y_true, y_pred, k):
     y_pred : list
         A list of lists of predicted elements
     k : int 
-    	The maximum number of predicted elements
+        The maximum number of predicted elements
     """
     return np.mean([average_precision(a,p,k) for a,p in zip(y_true, y_pred)])
 
