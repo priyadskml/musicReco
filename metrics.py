@@ -13,9 +13,6 @@ from sklearn.metrics import ndcg_score
 def root_mean_square_error(y_true, y_pred):
 	return np.sqrt(mean_squared_error(y_true, y_pred))
 
-
-
-
 '''
  These are for top-n recommendations.
 '''
@@ -87,6 +84,46 @@ def mean_average_precision(y_true, y_pred, k):
     """
     return np.mean([average_precision(a,p,k) for a,p in zip(y_true, y_pred)])
 
-# Truncated Normalized Discounted Cumulative Gain
-# sklearn.metrics.ndcg_score
-# http://scikit-learn.org/stable/modules/generated/sklearn.metrics.ndcg_score.html#sklearn.metrics.ndcg_score
+# Truncated Normalized Discounted Cumulative Gain (NDCG@K)
+
+# First, we need DCG@K
+def dcg_k(y_true, y_pred, k):
+    """
+    y_true : array-like, shape = [n_samples]
+        Ground truth (true relevance labels).
+    y_pred : array-like, shape = [k]
+        y_pred[i] is the ith top-scored document.
+    k : int
+        Rank.
+    """
+    if len(y_pred) > k:
+        y_pred = y_pred[:k]
+
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    rel = y_true[y_pred]
+    gains = 2 ** rel - 1
+    discounts = np.log2(np.arange(len(y_pred)) + 2)
+    return np.sum(gains / discounts)
+
+
+def ndcg_k(y_true, y_pred, k):
+    """Normalized discounted cumulative gain (NDCG) at rank k
+
+    y_true : array-like, shape = [n_samples]
+        Ground truth (true relevance labels).
+    y_pred : array-like, shape = [k]
+        y_pred[i] is the ith top-scored document.
+    k : int
+        Rank.
+    """
+    if len(y_pred) > k:
+        y_pred = y_pred[:k]
+
+    best_y_pred = np.argsort(y_true)[::-1]
+    best = dcg_k(y_true, best_y_pred[:k], k)
+    return dcg_k(y_true, y_pred, k) / best
+
+
+
+
