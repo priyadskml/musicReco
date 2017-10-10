@@ -86,7 +86,10 @@ for user, indices in groups.groups.iteritems():
             session.append(user_record.iloc[i+1].name)
 
 # SAVE SESSIONS
-sesssions.to_csv('listening-sessions.csv')    
+with open('listening-sessions.csv','w') as f:
+    for s in sessions:
+        f.write(", ".join(str(s)))
+        f.write("\n")
 print('Wrote listening sessions to file..')
             
             
