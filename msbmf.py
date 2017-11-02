@@ -1,9 +1,14 @@
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
+
 class MSBMF():
     
     def __init__(self, R, Rte, S, D, k, alpha, l, eta, iterations):
         """
         Perform matrix factorization to predict empty
         entries in a matrix.
+
+        L = 0.5 \sum_{u,i} (r_u,i - r'_u,i)^2 + 0.5alpha \sum_{i,j \in n(i, k)} (s_i,j - qiqj)^2 + l * regularization
         
         Arguments
         - R (ndarray)     : user-item rating matrix
@@ -28,10 +33,17 @@ class MSBMF():
         self.alpha = alpha
         self.iterations = iterations
 
+        nbrs = NearestNeighbors(n_neighbors=self.k + 1).fit(self.S)
+        # Does contain itself, hence k + 1
+        self.k_distances, self.k_indices = nbrs.kneighbors(self.S)
+        
+
+
     def train(self):
         # Initialize user and item latent feature matrice
         self.P = np.random.normal(scale=1./self.D, size=(self.num_users, self.D))
         self.Q = np.random.normal(scale=1./self.D, size=(self.num_items, self.D))
+#         print (self.k_distances, self.k_indices)
         
         # Initialize the biases
         self.b_u = np.zeros(self.num_users)
@@ -49,6 +61,7 @@ class MSBMF():
         ]
         
         # Perform stochastic gradient descent for number of iterations
+        # We use the song similarities in SGD for backprop.
         training_process = []
         for i in range(self.iterations):
             np.random.shuffle(self.samples)
@@ -91,7 +104,12 @@ class MSBMF():
             
             # Update user and item latent feature matrices
             self.P[i, :] += self.eta * (e * self.Q[j, :] - self.l * self.P[i,:])
-            self.Q[j, :] += self.eta * (e * self.P[i, :] - self.l * self.Q[j,:])
+
+            # Backprop rule also contains si,j term hiii
+            similarity_factor = np.zeros_like(self.Q[j, :])
+            for x, d in enumerate(self.k_distances[j]):
+                similarity_factor += (d - self.Q[j, :].dot(self.Q[self.k_indices[i][x], :].T)) * (self.Q[self.k_indices[i][x], :])
+            self.Q[j, :] += self.eta * (e * self.P[i, :] - self.l * self.Q[j,:] - self.alpha * similarity_factor)
 
     def get_rating(self, i, j):
         """
@@ -104,4 +122,4 @@ class MSBMF():
         """
         Computer the full matrix using the resultant biases, P and Q
         """
-        return mf.b + mf.b_u[:,np.newaxis] + mf.b_i[np.newaxis:,] + mf.P.dot(mf.Q.T)
+        return self.b + self.b_u[:,np.newaxis] + self.b_i[np.newaxis:,] + self.P.dot(self.Q.T)
