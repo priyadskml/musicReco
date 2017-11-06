@@ -142,14 +142,13 @@ implicit_ratings = np.ceil(5 * relative_preferences)
 io.mmwrite("ratings.mtx", implicit_ratings)
 print('Wrote ratings matrix to file..')
 
-
-
 # SAVE TRACK IDS
 scoring_ranks = [data.loc[s, ['track-id']].values.flatten() for s in sessions]
-with open('musics-sentences.csv','w') as f:
+with open('musics-sentences.txt','w') as f:
     for s in scoring_ranks:
-        f.write(", ".join(s))
+        f.write(" ".join(s))
         f.write("\n")
+
 print('Wrote song2vec set to file..')
                 
 
