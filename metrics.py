@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+import math
 # from sklearn.metrics import ndcg_score
 
 '''
@@ -22,10 +23,12 @@ def precision(y_true, y_pred, k):
     if len(y_pred)>k:
         y_pred = y_pred[:k]
 
-    if not y_true:
-        return 0.0
+#     if not y_true:
+#         return 0.0
+#     y_pred = y_pred.flatten()
+    y_true = y_true.flatten()
 
-    return len(set(y_pred).intersection(y_true)) /  float(len(y_pred))
+    return len(set(y_pred).intersection(set(y_true)))/  float(len(y_pred))
 
 def precision_k(y_true, y_pred, k):
     """
@@ -38,7 +41,7 @@ def precision_k(y_true, y_pred, k):
     k : int 
         The maximum number of predicted elements
     """
-    set(b1).intersection(b2)
+#     set(b1).intersection(b2)
     return np.mean([precision(a, p, k)  for a,p in zip(y_true, y_pred)])
 
 
@@ -59,8 +62,8 @@ def average_precision(y_true, y_pred, k):
     if len(y_pred)>k:
         y_pred = y_pred[:k]
 
-    if not y_true:
-        return 0.0
+    # if y_true.all() is None or len(y_true) < 1:
+    #     return 0.0
 
     score = 0.0
     tp = 0.0
@@ -87,43 +90,45 @@ def mean_average_precision(y_true, y_pred, k):
 # Truncated Normalized Discounted Cumulative Gain (NDCG@K)
 
 # First, we need DCG@K
-def dcg_k(y_true, y_pred, k):
+def find_dcg(element_list, k=10):
     """
-    y_true : array-like, shape = [n_samples]
-        Ground truth (true relevance labels).
-    y_pred : array-like, shape = [k]
-        y_pred[i] is the ith top-scored document.
-    k : int
-        Rank.
+    Discounted Cumulative Gain (DCG)
+    The definition of DCG can be found in this paper:
+        Azzah Al-Maskari, Mark Sanderson, and Paul Clough. 2007.
+        "The relationship between IR effectiveness measures and user satisfaction."
+    Parameters:
+        element_list - a list of ranks Ex: [5,4,2,2,1]
+    Returns:
+        score
     """
-    if len(y_pred) > k:
-        y_pred = y_pred[:k]
-
-    y_true = np.asarray(y_true)
-    y_pred = np.asarray(y_pred)
-    rel = y_true[y_pred]
-    gains = 2 ** rel - 1
-    discounts = np.log2(np.arange(len(y_pred)) + 2)
-    return np.sum(gains / discounts)
+    score = 0.0
+    for order, rank in enumerate(element_list):
+#         print rank
+        if order < k:
+            score += float(rank)/math.log((order+2))
+    return score
 
 
-def ndcg_k(y_true, y_pred, k):
-    """Normalized discounted cumulative gain (NDCG) at rank k
-
-    y_true : array-like, shape = [n_samples]
-        Ground truth (true relevance labels).
-    y_pred : array-like, shape = [k]
-        y_pred[i] is the ith top-scored document.
-    k : int
-        Rank.
+def find_ndcg(reference, hypothesis, k=10):
     """
-    if len(y_pred) > k:
-        y_pred = y_pred[:k]
+    Normalized Discounted Cumulative Gain (nDCG)
+    Normalized version of DCG:
+        nDCG = DCG(hypothesis)/DCG(reference)
+    Parameters:
+        reference   - a gold standard (perfect) ordering Ex: [5,4,3,2,1]
+        hypothesis  - a proposed ordering Ex: [5,2,2,3,1]
+    Returns:
+        ndcg_score  - normalized score
+    """
+#     print hypothesis
+#     print reference
 
-    best_y_pred = np.argsort(y_true)[::-1]
-    best = dcg_k(y_true, best_y_pred[:k], k)
-    return dcg_k(y_true, y_pred, k) / best
+    return find_dcg(hypothesis)/find_dcg(reference)
 
-
-
+def ndcg_k(y_true, y_pred, k=10):
+    ndcgs = []
+#     print len(y_pred)
+    for i in range(len(y_pred)):
+        ndcgs.append(find_ndcg(y_true[i].flatten(), y_pred[i], k=10))
+    return np.mean(ndcgs)
 
