@@ -102,10 +102,10 @@ def find_dcg(element_list, k=10):
         score
     """
     score = 0.0
+#     print element_list
     for order, rank in enumerate(element_list):
-#         print rank
         if order < k:
-            score += float(rank)/math.log((order+2))
+            score += (float(rank))/math.log((order+2), 2)
     return score
 
 
@@ -122,13 +122,15 @@ def find_ndcg(reference, hypothesis, k=10):
     """
 #     print hypothesis
 #     print reference
-
+#     res = find_dcg(hypothesis)/find_dcg(reference)
+#     print res
     return find_dcg(hypothesis)/find_dcg(reference)
 
-def ndcg_k(y_true, y_pred, k=10):
+def ndcg_k(y_true, y_pred, test_r, k=10):
     ndcgs = []
-#     print len(y_pred)
+    # For ground truth y_rec 
+    # For the actual
     for i in range(len(y_pred)):
-        ndcgs.append(find_ndcg(y_true[i].flatten(), y_pred[i], k=10))
+        ndcgs.append(find_ndcg(test_r[i, y_true[i].flatten()], test_r[i,y_pred[i]], k=10))
     return np.mean(ndcgs)
 
