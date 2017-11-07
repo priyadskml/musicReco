@@ -37,7 +37,8 @@ words_len = len(words) - 2
 
 # ordered_vecs = vec[indices]
 
-dim = vec[i].shape[1]
+print vec[0].shape
+dim =100
 print dim
 vecs = []
 j = 0
@@ -50,9 +51,11 @@ for tid in ordered:
 	j += 1
 	if j % 10000 == 0:
 		print j
-ordered_vecs = np.ndarray(vecs)
+ordered_vecs = np.array(vecs)
 
 # This will give an ordered version of the vectors 
+print("Ordered vectors...")
+
 
 # Now we load the ratings
 implicit_ratings = io.mmread("ratings.mtx")
