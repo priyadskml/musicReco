@@ -25,9 +25,9 @@ with open("trackid-index.csv") as f:
 
 indices = []
 i = 0
-for id in x:
-	if id in ordered:
-		indices.append(ordered.find(id)) 
+for tid in words:
+	if tid in ordered:
+		indices.append(ordered.find(tid)) 
 	if i % 10000 == 0:
 		print i
 	i += 1
