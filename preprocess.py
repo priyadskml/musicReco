@@ -13,7 +13,7 @@ dataset_f_name = "userid-timestamp-artid-artname-traid-traname.tsv"
 
 
 download_dataset(URL, f_name)
-user_data = load_dataset(dir_name, dataset_f_name, None)
+user_data = load_dataset(dir_name, dataset_f_name, 2000000)
 
 
 # ## Cleaning infrequent data
@@ -122,6 +122,15 @@ plays_matrix = csr_matrix(playcounts.values)
 io.mmwrite("playcounts.mtx", plays_matrix)
 print('Wrote playcounts matrix to file..')
 
+track_ids = list(playcounts.columns)
+with open("trackid-index.csv", "a+") as f:
+    for tid in track_ids:
+        f.write(tid + "\n")
+
+user_ids = list(playcounts.index)
+with open("userid-index.csv", "a+") as f:
+    for uid in user_ids:
+        f.write(uid + "\n")
 
 
 # List of number of songs ever played by each user. Reduces computation
