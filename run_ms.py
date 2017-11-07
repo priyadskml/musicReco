@@ -23,16 +23,34 @@ words, vec = load_vectors('song2vec.txt')
 with open("trackid-index.csv") as f:
 	ordered = f.read().splitlines() 
 
-indices = []
-i = 0
-for tid in words:
-	if tid in ordered:
-		indices.append(ordered.index(tid)) 
-	if i % 10000 == 0:
-		print i
-	i += 1
+ordered_len = len(ordered)
+words_len = len(words) - 2
 
-ordered_vecs = vec[indices]
+# indices = []
+# i = 0
+# for tid in words:
+# 	if tid in ordered:
+# 		indices.append(ordered.index(tid)) 
+# 	if i % 10000 == 0:
+# 		print i
+# 	i += 1
+
+# ordered_vecs = vec[indices]
+
+dim = vec[i].shape[1]
+print dim
+vecs = []
+j = 0
+for tid in ordered:
+	if tid in words:
+		i = words.index(tid)
+		vecs.append(vec[i])
+	else:
+		vecs.append(np.random.randn((dim)))
+	j += 1
+	if j % 10000 == 0:
+		print j
+ordered_vecs = np.ndarray(vecs)
 
 # This will give an ordered version of the vectors 
 
