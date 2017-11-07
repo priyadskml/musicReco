@@ -30,4 +30,9 @@ def load_dataset(dir_name, f_name, n):
 	print("Read File...")
 	return data
 
+# Returns names and the values
+def load_vectors(f_name):
+	data = pd.read_csv(f_name, delimiter=' ', skiprows=1,index_col=0)
+	return list(data.index), data.values
+
 # def load_metadata(dir_name, f_name):
