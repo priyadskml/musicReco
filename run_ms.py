@@ -27,7 +27,7 @@ indices = []
 i = 0
 for tid in words:
 	if tid in ordered:
-		indices.append(ordered.find(tid)) 
+		indices.append(ordered.index(tid)) 
 	if i % 10000 == 0:
 		print i
 	i += 1
