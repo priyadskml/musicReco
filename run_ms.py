@@ -53,8 +53,8 @@ print (msk.shape)
 train_ratings = implicit_ratings.copy()
 test_ratings = implicit_ratings.copy()
     
-train_ratings[msk] = r[msk]
-test_ratings[~msk] = r[~msk] # inverse of boolean mask
+train_ratings[~msk] = r[~msk]
+test_ratings[msk] = r[msk] # inverse of boolean mask
 
 print("Split ratings...")
 
@@ -78,6 +78,12 @@ from msbmf import *
 msmf = MSBMF(train_r, test_r, S=ordered_vecs, D=D,k=k, alpha=alpha, l=l,eta=0.05, iterations=100)
 # R, Rte, S, D, k, alpha, l, eta, iterations)
 training_process = msmf.train()
+
+predictions = msmf.full_matrix()
+masked_predictions[msk] = r[msk]
+
+print "RMSE: %f" % root_mean_square_error(test_r, masked_predictions)
+print "MAE: %f" % mean_absolute_error(test_r, masked_predictions)
 
 
 
