@@ -95,6 +95,7 @@ class MF():
     def full_matrix(self):
         """
         Computer the full matrix using the resultant biases, P and Q
+<<<<<<< HEAD
         """ 
         return self.b + self.b_u[:,np2.newaxis] + self.b_i[np2.newaxis:,] + self.P.dot(self.Q.T)
-        #return mf.b + mf.b_u[:,np.newaxis] + mf.b_i[np.newaxis:,] + mf.P.dot(mf.Q.T)
+

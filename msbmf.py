@@ -68,7 +68,7 @@ class MSBMF():
             self.sgd()
             mse = self.mse()
             training_process.append((i, mse))
-            if (i+1) % 10 == 0:
+            if (i+1) % 1 == 0:
                 print("Iteration: %d ; error = %.4f" % (i+1, mse))
         
         return training_process
@@ -108,7 +108,8 @@ class MSBMF():
             # Backprop rule also contains si,j term hiii
             similarity_factor = np.zeros_like(self.Q[j, :])
             for x, d in enumerate(self.k_distances[j]):
-                similarity_factor += (d - self.Q[j, :].dot(self.Q[self.k_indices[i][x], :].T)) * (self.Q[self.k_indices[i][x], :])
+                if d != 0:
+                    similarity_factor += (d - self.Q[j, :].dot(self.Q[self.k_indices[i][x], :].T)) * (self.Q[self.k_indices[i][x], :])
             self.Q[j, :] += self.eta * (e * self.P[i, :] - self.l * self.Q[j,:] - self.alpha * similarity_factor)
 
     def get_rating(self, i, j):

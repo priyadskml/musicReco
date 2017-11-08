@@ -96,15 +96,15 @@ train_r = np.array(train_ratings)
 print("Now we train...")
 
 from msbmf import *
-msmf = MSBMF(train_r, test_r, S=ordered_vecs, D=D,k=k, alpha=alpha, l=l,eta=0.05, iterations=100)
+msmf = MSBMF(train_r, test_r, S=ordered_vecs, D=D,k=k, alpha=alpha, l=l,eta=0.05, iterations=20)
 # R, Rte, S, D, k, alpha, l, eta, iterations)
 training_process = msmf.train()
 
 predictions = msmf.full_matrix()
-masked_predictions[msk] = r[msk]
+predictions[msk] = r[msk]
 
-print "RMSE: %f" % root_mean_square_error(test_r, masked_predictions)
-print "MAE: %f" % mean_absolute_error(test_r, masked_predictions)
+print "RMSE: %f" % root_mean_square_error(test_r, predictions)
+print "MAE: %f" % mean_absolute_error(test_r, predictions)
 
 
 
