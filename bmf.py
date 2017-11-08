@@ -1,3 +1,5 @@
+import numpy as np2
+
 class MF():
     
     def __init__(self, R, Rte, K, alpha, beta, iterations):
@@ -22,13 +24,13 @@ class MF():
 
     def train(self):
         # Initialize user and item latent feature matrice
-        self.P = np.random.normal(scale=1./self.K, size=(self.num_users, self.K))
-        self.Q = np.random.normal(scale=1./self.K, size=(self.num_items, self.K))
+        self.P = np2.random.normal(scale=1./self.K, size=(self.num_users, self.K))
+        self.Q = np2.random.normal(scale=1./self.K, size=(self.num_items, self.K))
         
         # Initialize the biases
-        self.b_u = np.zeros(self.num_users)
-        self.b_i = np.zeros(self.num_items)
-        self.b = np.mean(self.R[np.where(self.R != 0)])
+        self.b_u = np2.zeros(self.num_users)
+        self.b_i = np2.zeros(self.num_items)
+        self.b = np2.mean(self.R[np2.where(self.R != 0)])
         
         # Create a list of training samples
         self.samples = [
@@ -41,7 +43,7 @@ class MF():
         # Perform stochastic gradient descent for number of iterations
         training_process = []
         for i in range(self.iterations):
-            np.random.shuffle(self.samples)
+            np2.random.shuffle(self.samples)
             self.sgd()
             mse = self.mse()
             training_process.append((i, mse))
@@ -57,14 +59,14 @@ class MF():
         xs, ys = self.Rte.nonzero()
         predicted = self.full_matrix()
         error = 0
-        count=0
+        count = 0
         for x, y in zip(xs, ys):
             err =  pow(self.Rte[x, y] - predicted[x, y], 2)
             if(err>0):
                 count += 1
                 error += err               
         error = error/count
-        return np.sqrt(error)
+        return np2.sqrt(error)
 
     def sgd(self):
         """
@@ -93,5 +95,6 @@ class MF():
     def full_matrix(self):
         """
         Computer the full matrix using the resultant biases, P and Q
-        """
-        return mf.b + mf.b_u[:,np.newaxis] + mf.b_i[np.newaxis:,] + mf.P.dot(mf.Q.T)
+        """ 
+        return self.b + self.b_u[:,np2.newaxis] + self.b_i[np2.newaxis:,] + self.P.dot(self.Q.T)
+        #return mf.b + mf.b_u[:,np.newaxis] + mf.b_i[np.newaxis:,] + mf.P.dot(mf.Q.T)
